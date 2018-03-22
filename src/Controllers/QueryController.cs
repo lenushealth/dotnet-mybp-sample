@@ -43,16 +43,21 @@
 
                 var model = data.Select(s =>
                 {
-                    var reading = new BloodPressureSampleModel()
+                    if (s?.CorrelationObjects?.Any() ?? false)
                     {
-                        From = s.DateRange.LowerBound,
-                        Diastolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "BloodPressureDiastolic")
-                            .QuantityValue,
-                        Systolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "BloodPressureSystolic")
-                            .QuantityValue
-                    };
-                    return reading;
-                }).OrderByDescending(s => s.From).ToList();
+                        var reading = new BloodPressureSampleModel()
+                        {
+                            From = s.DateRange.LowerBound,
+                            Diastolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "BloodPressureDiastolic")
+                                .QuantityValue,
+                            Systolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "BloodPressureSystolic")
+                                .QuantityValue
+                        };
+                        return reading;
+                    }
+
+                    return null;
+                }).Where(s => s != null).OrderByDescending(s => s.From).ToList();
 
                 return View("QueryResults", model);
             }
