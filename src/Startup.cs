@@ -34,7 +34,12 @@
                     o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     o.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
                 })
-                .AddCookie()
+                .AddCookie(o =>
+                {
+                    o.AccessDeniedPath = "/error";
+                    o.LogoutPath = "/Home/Logout";
+                    o.LoginPath = "/Home/Login";
+                })
                 .AddOpenIdConnect(o =>
                 {
                     configuration.GetSection("OpenIdConnect").Bind(o);

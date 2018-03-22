@@ -1,9 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MyBp.Controllers
 {
     using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using System.Threading.Tasks;
 
+    [Route("")]
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -11,9 +17,24 @@ namespace MyBp.Controllers
             return View();
         }
 
-        public IActionResult Logout()
+        [Route("login")]
+        public async Task Login()
         {
-            return this.SignOut(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!this.User.Identity.IsAuthenticated)
+            {
+                await this.HttpContext.ChallengeAsync(new AuthenticationProperties()
+                {
+                    RedirectUri = this.Url.Action("Index")
+                });
+            }
         }
+
+        [Route("logout")]
+        public async Task Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme );
+            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
     }
 }
