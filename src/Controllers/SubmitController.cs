@@ -34,21 +34,21 @@ namespace MyBp.Controllers
             var sample = new HealthSample()
             {
                 DateRange = dateRange,
-                Type = "BloodPressure",
+                Type = "blood_pressure",
                 ClientAssignedId = Guid.NewGuid().ToString(),
                 CorrelationObjects = new List<HealthSample>()
                 {
                     new HealthSample()
                     {
                         DateRange = dateRange,
-                        Type = "BloodPressureSystolic",
+                        Type = "blood_pressure_systolic",
                         QuantityValue = systolic,
                         ClientAssignedId = Guid.NewGuid().ToString()
                     },
                     new HealthSample()
                     {
                         DateRange = dateRange,
-                        Type = "BloodPressureDiastolic",
+                        Type = "blood_pressure_diastolic",
                         QuantityValue = diastolic,
                         ClientAssignedId = Guid.NewGuid().ToString()
                     }

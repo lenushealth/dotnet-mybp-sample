@@ -20,7 +20,7 @@
 
         public IActionResult Index()
         {
-            var model = new HealthDataQueryRequest(DateTimeOffset.UtcNow.AddMonths(-2), DateTimeOffset.UtcNow, "BloodPressure", "BloodPressureSystolic", "BloodPressureDiastolic");
+            var model = new HealthDataQueryRequest(DateTimeOffset.UtcNow.AddMonths(-2), DateTimeOffset.UtcNow, "blood_pressure", "blood_pressure_diastolic", "blood_pressure_systolic");
             return View(model);
         }
 
@@ -48,9 +48,9 @@
                         var reading = new BloodPressureSampleModel()
                         {
                             From = s.DateRange.LowerBound,
-                            Diastolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "BloodPressureDiastolic")
+                            Diastolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "blood_pressure_diastolic")
                                 .QuantityValue,
-                            Systolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "BloodPressureSystolic")
+                            Systolic = s.CorrelationObjects.SingleOrDefault(x => x.Type == "blood_pressure_systolic")
                                 .QuantityValue
                         };
                         return reading;
