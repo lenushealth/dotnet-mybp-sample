@@ -52,9 +52,6 @@
         "location": "[parameters('siteLocation')]",
         "sku": {
           "name" : "[parameters('sku')]"
-        },
-        "properties": {
-          "name": "[parameters('hostingPlanName')]"
         }
       },
       {
@@ -66,8 +63,9 @@
           "[resourceId('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
         ],
         "properties": {
-          "name": "[parameters('siteName')]",
-          "serverFarmId": "[resourceId('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
+          "serverFarmId": "[parameters('hostingPlanName')]",
+          "httpsOnly": true,
+          "clientAffinityEnabled" : false          
         },
         "resources": [
           {
@@ -78,14 +76,30 @@
               "[resourceId('Microsoft.Web/Sites/', parameters('siteName'))]"
             ],
             "properties": {
-              "appSettings": [
-                { "name": "OpenIdConnect:Authority", "value": "[parameters('authority')]" },
-                { "name": "OpenIdConnect:ClientId", "value": "[parameters('clientId')]" },
-                { "name": "OpenIdConnect:ClientSecret", "value": "[parameters('clientSecret')]" },
-                { "name": "HealthDataClient:BaseUri", "value": "[parameters('healthDataClientBaseUri')]" }
-              ]
+              "phpVersion": "off",
+              "webSocketsEnabled": false,
+              "alwaysOn": false,
+              "requestTracingEnabled": true,
+              "httpLoggingEnabled": true,
+              "logsDirectorySizeLimit": 40,
+              "detailedErrorLoggingEnabled": true
             }
-          }
+          },
+          {
+            "apiVersion": "2016-08-01",
+            "name": "appsettings",
+            "type": "config",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+            ],
+            "properties": {
+                "OpenIdConnect:Authority": "[parameters('authority')]",
+                "OpenIdConnect:ClientId": "[parameters('clientId')]",
+                "OpenIdConnect:ClientSecret": "[parameters('clientSecret')]",
+                "HealthDataClient:BaseUri" : "[parameters('healthDataClientBaseUri')]",
+                "WEBSITE_TIME_ZONE": "GMT Standard Time"
+            }
+          } 
         ]
       }
     ]
