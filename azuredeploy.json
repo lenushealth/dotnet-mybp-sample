@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
       "siteName": {
@@ -9,106 +9,97 @@
         "type": "string"
       },
       "siteLocation": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "UK West"
       },
       "sku": {
         "type": "string",
         "allowedValues": [
-          "Free",
-          "Shared",
-          "Basic",
-          "Standard"
+          "F1",
+          "B1",
+          "S1"
         ],
-        "defaultValue": "Free"
-      },
-      "workerSize": {
-        "type": "string",
-        "allowedValues": [
-          "0",
-          "1",
-          "2"
-        ],
-        "defaultValue": "0"
+        "defaultValue": "F1"
       },
       "authority": {
         "type": "string",
-        "defaultValue": "<uri-to-identity-service>"
+        "defaultValue": "https://identity.dhi-dse.scot"
       },
       "clientId": {
         "type": "string",
-        "defaultValue": "<client-id>"
+        "defaultValue": "prefix.mybp",
+        "metadata": {
+          "description" : "Obtain a client id by visiting the developer portal"
+        }
       },
       "clientSecret": {
         "type": "string",
-        "defaultValue": "<client-secret>"
+        "defaultValue": "secret",
+        "metadata": {
+          "description" : "Set a client secret by visiting the developer portal"
+        }
       }, 
       "healthDataClientBaseUri": {
         "type": "string",
-        "defaultValue": "<uri-to-data-service>"
-      },                  
-      "repoUrl": {
-        "type": "string"
-      },
-      "branch": {
-        "type": "string"
+        "defaultValue": "https://data.dhi-dse.scot"
       }
     },
     "resources": [
       {
-        "apiVersion": "2014-06-01",
+        "apiVersion": "2017-08-01",
         "name": "[parameters('hostingPlanName')]",
         "type": "Microsoft.Web/serverFarms",
         "location": "[parameters('siteLocation')]",
-        "properties": {
-          "name": "[parameters('hostingPlanName')]",
-          "sku": "[parameters('sku')]",
-          "workerSize": "[parameters('workerSize')]",
-          "numberOfWorkers": 1
+        "sku": {
+          "name" : "[parameters('sku')]"
         }
       },
       {
-        "apiVersion": "2014-06-01",
+        "apiVersion": "2016-08-01",
         "name": "[parameters('siteName')]",
         "type": "Microsoft.Web/Sites",
         "location": "[parameters('siteLocation')]",
         "dependsOn": [
-          "[concat('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
+          "[resourceId('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
         ],
         "properties": {
-          "name": "[parameters('siteName')]",
-          "serverFarm": "[parameters('hostingPlanName')]"
+          "serverFarmId": "[parameters('hostingPlanName')]",
+          "httpsOnly": true,
+          "clientAffinityEnabled" : false          
         },
         "resources": [
           {
-            "apiVersion": "2014-04-01",
+            "apiVersion": "2016-08-01",
             "type": "config",
             "name": "web",
             "dependsOn": [
-              "[concat('Microsoft.Web/Sites/', parameters('siteName'))]"
+              "[resourceId('Microsoft.Web/Sites/', parameters('siteName'))]"
             ],
             "properties": {
-              "appSettings": [
-                { "name": "OpenIdConnect:Authority", "value": "[parameters('authority')]" },
-                { "name": "OpenIdConnect:ClientId", "value": "[parameters('clientId')]" },
-                { "name": "OpenIdConnect:ClientSecret", "value": "[parameters('clientSecret')]" },
-                { "name": "HealthDataClient:BaseUri", "value": "[parameters('healthDataClientBaseUri')]" }
-              ]
+              "phpVersion": "off",
+              "webSocketsEnabled": false,
+              "alwaysOn": false,
+              "requestTracingEnabled": true,
+              "httpLoggingEnabled": true,
+              "logsDirectorySizeLimit": 40,
+              "detailedErrorLoggingEnabled": true
             }
           },
           {
-            "apiVersion": "2014-04-01",
-            "name": "web",
-            "type": "sourcecontrols",
+            "apiVersion": "2016-08-01",
+            "name": "appsettings",
+            "type": "config",
             "dependsOn": [
-              "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]",
-              "[concat('Microsoft.Web/Sites/', parameters('siteName'), '/config/web')]"
+                "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
             ],
             "properties": {
-              "RepoUrl": "[parameters('repoUrl')]",
-              "branch": "[parameters('branch')]",
-              "IsManualIntegration": true
+                "OpenIdConnect:Authority": "[parameters('authority')]",
+                "OpenIdConnect:ClientId": "[parameters('clientId')]",
+                "OpenIdConnect:ClientSecret": "[parameters('clientSecret')]",
+                "HealthDataClient:BaseUri" : "[parameters('healthDataClientBaseUri')]",
+                "WEBSITE_TIME_ZONE": "GMT Standard Time"
             }
-          }
+          } 
         ]
       }
     ]
