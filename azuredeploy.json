@@ -32,7 +32,7 @@
       },
       "authority": {
         "type": "string",
-        "defaultValue": "https://<identity-endpoint>"
+        "defaultValue": "https://identity.dhi-dse.scot"
       },
       "clientId": {
         "type": "string",
@@ -50,7 +50,7 @@
       }, 
       "healthDataClientBaseUri": {
         "type": "string",
-        "defaultValue": "https://<health-data-endpoint>"
+        "defaultValue": "https://data.dhi-dse.scot"
       }
     },
     "resources": [
