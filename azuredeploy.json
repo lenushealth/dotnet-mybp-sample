@@ -21,15 +21,6 @@
         ],
         "defaultValue": "F1"
       },
-      "workerSize": {
-        "type": "string",
-        "allowedValues": [
-          "Small",
-          "Medium",
-          "Large"
-        ],
-        "defaultValue": "Small"
-      },
       "authority": {
         "type": "string",
         "defaultValue": "https://identity.dhi-dse.scot"
@@ -60,8 +51,7 @@
         "type": "Microsoft.Web/serverFarms",
         "location": "[parameters('siteLocation')]",
         "sku": {
-          "name" : "[parameters('sku')]",
-          "capacity": "[parameters('workerSize')]"
+          "name" : "[parameters('sku')]"
         },
         "properties": {
           "name": "[parameters('hostingPlanName')]"
