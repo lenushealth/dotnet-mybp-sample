@@ -2,6 +2,7 @@
 {
     using System;
     using Models;
+    using Microsoft.AspNetCore.Mvc;
 
     public class ProblemDetailsException : ProblemDetailsException<ProblemDetails>
     {

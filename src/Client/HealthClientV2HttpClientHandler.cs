@@ -8,6 +8,7 @@
     using Models;
     using Newtonsoft.Json;
     using Services;
+    using Microsoft.AspNetCore.Mvc;
 
     public class HealthClientV2HttpClientHandler : HttpClientHandler
     {
@@ -20,7 +21,6 @@
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // See if the request has an authorize header
             var auth = request.Headers.Authorization;
             if (auth != null)
             {
