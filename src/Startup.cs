@@ -1,12 +1,10 @@
-﻿namespace MyBp
+﻿using System;
+using Polly;
+
+namespace MyBp
 {
-    using System;
-    using System.Collections.Generic;
     using System.Globalization;
-    using System.Net;
     using System.Net.Http;
-    using System.Reflection;
-    using System.Runtime.InteropServices.ComTypes;
     using System.Threading.Tasks;
     using Client;
     using Config;
@@ -20,7 +18,6 @@
     using Microsoft.AspNetCore.Localization;
     using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-    using Models;
     using Refit;
     using Services;
 
@@ -99,17 +96,21 @@
             serviceCollection.AddSingleton<IAccessTokenAccessor, AccessTokenAccessor>();
             serviceCollection.AddOptions();
 
-            serviceCollection.Configure<HealthDataClientOptions>(configuration.GetSection("HealthDataClient"));
+            serviceCollection.AddTransient(typeof(HealthClientV2HttpClientHandler));
 
-            serviceCollection.AddScoped(s =>
-            {
-                var options = s.GetRequiredService<IOptions<HealthDataClientOptions>>().Value;
-                var client = new HttpClient(new HealthClientV2HttpClientHandler(s.GetRequiredService<IAccessTokenAccessor>()))
+            serviceCollection.AddRefitClient<IHealthDataClient>()
+                .ConfigureHttpClient(c =>
                 {
-                    BaseAddress = options.BaseUri
-                };
-                return RestService.For<IHealthDataClient>(client);
-            });
+                    var options = configuration.GetSection("HealthDataClient").Get<HealthDataClientOptions>();
+
+                    c.BaseAddress = options.BaseUri;
+                })
+                .AddHttpMessageHandler<HealthClientV2HttpClientHandler>()
+                .AddTransientHttpErrorPolicy(
+                    builder => builder.WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                )
+            );
+
             return serviceCollection;
         }
     }
