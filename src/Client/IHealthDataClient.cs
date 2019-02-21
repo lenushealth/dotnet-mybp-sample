@@ -13,8 +13,8 @@ namespace MyBp.Client
         Task<HealthSamplesDto> ExecuteQueryAsync(
             [Query(CollectionFormat.Multi)] IEnumerable<string> types,
             [Query(Format = "O")] Dictionary<string, object> queryDateParams,
-            [Query] string orderProperty = "CreationDate",
-            [Query] string orderDirection = "Ascending",
+            [Query] string orderProperty = null,
+            [Query] string orderDirection = null,
             [Query] int take = 100,
             [Query] int? skip = null);
 
