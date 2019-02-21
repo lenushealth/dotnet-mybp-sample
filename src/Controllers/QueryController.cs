@@ -1,4 +1,6 @@
-﻿namespace MyBp.Controllers
+﻿using System.Collections.Generic;
+
+namespace MyBp.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using System;
@@ -35,13 +37,16 @@
 
             try
             {
-                // just ask for a new query key everytime since I would need to determine whether my query params were unchanged)
-                var response = await this.client.CreateQueryAsync(request);
+                var requestDateParams = new Dictionary<string, object>
+                {
+                    {"RangeOfStartDate", request.RangeOfStartDate},
+                    {"RangeOfEndDate", request.RangeOfEndDate},
+                    {"RangeOfCreationDate", request.RangeOfCreationDate}
+                };
 
-                // ask for data
-                var data = await this.client.ExecuteQueryAsync(response.QueryKey, response.NumberOfResults * 2);
+                var queryResult = await this.client.ExecuteQueryAsync(request.Types, requestDateParams);
 
-                var model = data.Select(s =>
+                var model = queryResult.Datas.Select(s =>
                 {
                     if (s?.CorrelationObjects?.Any() ?? false)
                     {

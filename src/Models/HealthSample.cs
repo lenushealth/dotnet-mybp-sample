@@ -28,6 +28,15 @@
             public DateTimeOffset UpperBound { get; set; }
         }
 
+        public class HealthSampleDateRangeNotRequired : HealthSampleDateRange
+        {
+            [DataType(DataType.DateTime)]
+            public new DateTimeOffset? LowerBound { get; set; }
+
+            [DataType(DataType.DateTime)]
+            public new DateTimeOffset? UpperBound { get; set; }
+        }
+
         public string Device { get; set; }
         public string ClientAssignedId { get; set; }
         public string Subject { get; set; }

@@ -5,12 +5,11 @@
     using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
-    using Models;
     using Newtonsoft.Json;
     using Services;
     using Microsoft.AspNetCore.Mvc;
 
-    public class HealthClientV2HttpClientHandler : HttpClientHandler
+    public class HealthClientV2HttpClientHandler : DelegatingHandler
     {
         private readonly IAccessTokenAccessor accessTokenAccessor;
 
