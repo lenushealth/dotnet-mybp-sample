@@ -13,6 +13,10 @@
         [Required]
         public HealthSample.HealthSampleDateRange RangeOfStartDate { get; set; }
 
+        public HealthSample.HealthSampleDateRangeNotRequired RangeOfEndDate { get; set; }
+
+        public HealthSample.HealthSampleDateRangeNotRequired RangeOfCreationDate { get; set; }
+
         public HealthDataQueryRequest()
         {
             
