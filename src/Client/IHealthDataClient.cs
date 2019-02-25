@@ -6,10 +6,10 @@ namespace MyBp.Client
 {
     using System.Collections.Generic;
 
-    [Headers("Authorization: Bearer", "api-version: 2.0")]
+    [Headers("Authorization: Bearer")]
     public interface IHealthDataClient
     {
-        [Get("/api/sample")]
+        [Get("/sample")]
         Task<HealthSamplesDto> ExecuteQueryAsync(
             [Query(CollectionFormat.Multi)] IEnumerable<string> types,
             [Query(Format = "O")] Dictionary<string, object> queryDateParams,
@@ -18,7 +18,7 @@ namespace MyBp.Client
             [Query] int take = 100,
             [Query] int? skip = null);
 
-        [Post("/api/sample")]
+        [Post("/sample")]
         Task SubmitBloodPressureMeasurementAsync([Body(BodySerializationMethod.Serialized)] params HealthSample[] samples);
     }
 }
