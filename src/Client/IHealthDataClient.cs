@@ -9,7 +9,7 @@ namespace MyBp.Client
     [Headers("Authorization: Bearer")]
     public interface IHealthDataClient
     {
-        [Get("/sample")]
+        [Get("/query/v1/sample")]
         Task<HealthSamplesDto> ExecuteQueryAsync(
             [Query(CollectionFormat.Multi)] IEnumerable<string> types,
             [Query(Format = "O")] Dictionary<string, object> queryDateParams,
@@ -18,7 +18,7 @@ namespace MyBp.Client
             [Query] int take = 100,
             [Query] int? skip = null);
 
-        [Post("/sample")]
+        [Post("/sample/v1")]
         Task SubmitBloodPressureMeasurementAsync([Body(BodySerializationMethod.Serialized)] params HealthSample[] samples);
     }
 }
