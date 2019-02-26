@@ -9,7 +9,7 @@ namespace MyBp.Client
     [Headers("Authorization: Bearer")]
     public interface IHealthDataClient
     {
-        [Get("/query/v1")]
+        [Get("/sample/v1")]
         Task<HealthSamplesDto> ExecuteQueryAsync(
             [Query(CollectionFormat.Multi)] IEnumerable<string> types,
             [Query(Format = "O")] Dictionary<string, object> queryDateParams,
