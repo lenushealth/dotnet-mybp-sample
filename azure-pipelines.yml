@@ -1,3 +1,6 @@
+trigger:
+- master
+- refs/tags/*
 steps:
 - task: DotNetCoreCLI@2
   displayName: Restore
