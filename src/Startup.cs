@@ -4,7 +4,6 @@ using Polly;
 namespace MyBp
 {
     using System.Globalization;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Client;
     using Config;
@@ -13,13 +12,13 @@ namespace MyBp
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Authentication.Cookies;
-    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Localization;
-    using Microsoft.Extensions.Options;
-    using Microsoft.IdentityModel.Protocols.OpenIdConnect;
     using Refit;
     using Services;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+    using Microsoft.Extensions.Hosting;
 
     public static class LenusAuthenticationExtensions 
     {
@@ -47,12 +46,12 @@ namespace MyBp
                     
                     o.GetClaimsFromUserInfoEndpoint = true;
                     
-                    /* use the authorization_code flow */
-                    o.ResponseType = OpenIdConnectResponseType.Code;
+                    /* use the hybrid flow */
+                    o.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                     
                     o.Events.OnRemoteFailure += ctx =>
                     {
-                        ctx.Response.Redirect("/");
+                        ctx.Response.Redirect($"/?error={ctx?.Failure?.Message}");
                         ctx.HandleResponse();
                         return Task.CompletedTask;
                     };
@@ -128,19 +127,17 @@ namespace MyBp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLocalization();
-            services.AddMvc();
+            services.AddMvc()
+                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
 
             services.AddLenusAuthentication(Configuration);
             services.AddLenusAuthorisation();
-            services.AddLenusHealthClient(this.Configuration);
+            services.AddLenusHealthClient(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseAuthentication();
-            app.UseRequestLocalization();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -152,6 +149,8 @@ namespace MyBp
 
             app.UseStaticFiles();
 
+            app.UseAuthentication();
+
             var gbCulture = CultureInfo.GetCultureInfo("en-GB");
             app.UseRequestLocalization(
                 new RequestLocalizationOptions()
@@ -161,11 +160,15 @@ namespace MyBp
                     SupportedUICultures = new[] { gbCulture }
                 });
 
-            app.UseMvc(routes =>
+            app.UseRequestLocalization();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(e =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                e.MapDefaultControllerRoute();
             });
         }
     }
