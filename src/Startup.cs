@@ -127,8 +127,7 @@ namespace MyBp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLocalization();
-            services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
+            services.AddMvc();
 
             services.AddLenusAuthentication(Configuration);
             services.AddLenusAuthorisation();
