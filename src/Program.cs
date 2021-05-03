@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace MyBp
 {
@@ -7,13 +8,18 @@ namespace MyBp
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+            Activity.ForceDefaultIdFormat = true;
+
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseKestrel(o => o.AddServerHeader = false)
-                .UseDefaultServiceProvider(o => o.ValidateScopes = true)
-                .UseStartup<Startup>();
-    }
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.ConfigureKestrel(o => o.AddServerHeader = false);
+                    webBuilder.UseStartup<Startup>();
+                });
+    }    
 }
