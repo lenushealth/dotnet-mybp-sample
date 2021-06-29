@@ -1,3 +1,5 @@
+> This repository has been archived and the content merged into the `integration-samples` repo and will not receive any further updates, please refer to the `integration-samples` repository for updated samples.
+
 # dotnet-mybp-sample
 Sample implementation of the Lenus Health platform to retrieve and submit blood pressure samples for a logged in user
 
